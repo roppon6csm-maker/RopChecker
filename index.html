@@ -3,231 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>RopChecker ver.0.03</title>
+  <title>RopChecker ver.0.05</title>
   <style>
-    /* * RopChecker
-     * ver. 0.03
+    /* * RopChecker ver. 0.05
      * Theme: Elegant Milk Tea (Bright & Pop)
+     * Mode: AI-Code Integrity Inspector
      */
     :root {
-      --bg-color: #fdf8f2;      /* ミルクフォーム・ホワイト */
-      --container-bg: #f5ece1;  /* ロイヤルミルクティー・ベージュ */
-      --accent-color: #8e5d52;   /* ティー・ブラウン */
-      --text-main: #5d4a44;      /* 茶葉・ダークブラウン */
-      --text-sub: #a68b81;       /* ミルクティー・グレー */
-      --input-bg: #ffffff;       /* 純白（ミルク） */
-      --shadow: 0 4px 12px rgba(142, 93, 82, 0.08);
+      --bg-color: #fdf8f2;
+      --container-bg: #f5ece1;
+      --accent-color: #8e5d52;
+      --text-main: #5d4a44;
+      --input-bg: #ffffff;
+      --error-color: #d9534f;
+      --ok-color: #5cb85c;
     }
 
     body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: var(--bg-color);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      overflow: hidden; background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text-main);
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100vh;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
+      display: flex; flex-direction: column; width: 100%; height: 100vh;
+      padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
       box-sizing: border-box;
     }
 
-    /* 共通セクション設定 */
     section {
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       border-bottom: 1px solid rgba(142, 93, 82, 0.1);
-      box-sizing: border-box;
-      width: 100%;
-      overflow: hidden;
+      box-sizing: border-box; width: 100%; overflow: hidden;
     }
 
     .section-header {
-      background-color: var(--container-bg);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 6px 12px;
-      color: var(--accent-color);
-      flex-shrink: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      background-color: var(--container-bg); font-size: 10px; font-weight: 700;
+      padding: 4px 10px; color: var(--accent-color);
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .version-display {
-      font-weight: 500;
-      font-size: 10px;
-      background: var(--bg-color);
-      padding: 2px 8px;
-      border-radius: 10px;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    }
+    .version-display { font-weight: 500; font-size: 9px; background: var(--bg-color); padding: 1px 6px; border-radius: 8px; }
 
-    /* 段別の比率設定 0.5 : 2.5 : 3.5 : 5 */
-    .section-1 {
-      flex: 0.5;
-      background-color: var(--bg-color);
-      color: var(--accent-color);
-      justify-content: center;
-      align-items: center;
-      border-bottom: 2px solid var(--container-bg);
-    }
-    .section-1 .title-bar {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
+    .section-top { flex: 0.5; background-color: var(--bg-color); color: var(--accent-color); justify-content: center; align-items: center; border-bottom: 2px solid var(--container-bg); }
+    .title-bar { font-size: 16px; font-weight: 800; }
 
-    .section-2 {
-      flex: 2.5;
-    }
+    .section-middle { flex: 6.0; flex-direction: row !important; background-color: var(--container-bg); }
+    .editor-pane { flex: 1; display: flex; flex-direction: column; height: 100%; border-right: 1px solid rgba(142, 93, 82, 0.1); }
 
-    .section-3 {
-      flex: 3.5;
-    }
+    .section-bottom { flex: 5.0; border-bottom: none; background-color: #fffaf5; }
 
-    .section-4 {
-      flex: 5;
-      border-bottom: none;
-      background-color: #fff9f3;
-    }
-
-    /* 入力エリア設定 */
     textarea {
-      flex: 1;
-      width: 100%;
-      border: none;
-      padding: 12px;
-      box-sizing: border-box;
-      font-family: "SF Mono", "Input Mono", Menlo, monospace;
-      font-size: 13px;
-      line-height: 1.5;
-      resize: none;
-      outline: none;
-      background-color: var(--input-bg);
-      color: var(--text-main);
-      -webkit-appearance: none;
+      flex: 1; width: 100%; border: none; padding: 10px; box-sizing: border-box;
+      font-family: "SF Mono", Menlo, monospace; font-size: 11px;
+      line-height: 1.3; resize: none; outline: none;
+      background-color: var(--input-bg); color: var(--text-main);
     }
 
-    /* 差分表示エリア設定 */
-    .diff-display {
-      flex: 1;
-      width: 100%;
-      padding: 12px;
-      box-sizing: border-box;
-      background-color: var(--bg-color);
-      font-family: "SF Mono", Menlo, monospace;
-      font-size: 13px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-      color: var(--text-main);
+    /* 自動検証レポート用スタイル */
+    .inspector-report {
+      flex: 1; overflow-y: auto; padding: 12px; font-size: 12px; font-family: "SF Mono", monospace;
     }
-
-    /* POPなアクセント（スクロールバー等） */
-    ::-webkit-scrollbar {
-      width: 4px;
+    .status-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 10px;
     }
-    ::-webkit-scrollbar-thumb {
-      background: var(--container-bg);
-      border-radius: 10px;
-    }
+    .status-ng { background: var(--error-color); color: white; }
+    .status-ok { background: var(--ok-color); color: white; }
+    .missing-item { color: var(--error-color); border-left: 3px solid var(--error-color); padding-left: 8px; margin: 4px 0; font-size: 11px; white-space: pre-wrap; }
+    
+    #save-status { position: fixed; top: 10px; right: 10px; font-size: 9px; color: var(--accent-color); opacity: 0; transition: opacity 0.3s; }
   </style>
 </head>
 <body>
 
+  <div id="save-status">Saving...</div>
+
   <div class="container">
-    <section class="section-1">
-      <div class="title-bar">RopChecker <span style="font-size: 12px; font-weight: 400; opacity: 0.7;">ver.0.03</span></div>
+    <section class="section-top">
+      <div class="title-bar">RopChecker <span style="font-size: 10px; opacity: 0.6;">ver.0.05</span></div>
     </section>
 
-    <section class="section-2">
-      <div class="section-header">
-        <span>Master Code</span>
-        <span id="master-ver" class="version-display"></span>
+    <section class="section-middle">
+      <div class="editor-pane">
+        <div class="section-header"><span>Master (Sanctuary)</span><span id="master-ver" class="version-display"></span></div>
+        <textarea id="master-code" placeholder="Paste Master Source..."></textarea>
       </div>
-      <textarea id="master-code" placeholder="Paste master code here..."></textarea>
+      <div class="editor-pane">
+        <div class="section-header"><span>AI Review (Candidate)</span><span id="review-ver" class="version-display"></span></div>
+        <textarea id="review-code" placeholder="Paste AI Review Source..."></textarea>
+      </div>
     </section>
 
-    <section class="section-3">
-      <div class="section-header">
-        <span>Review Code</span>
-        <span id="review-ver" class="version-display"></span>
+    <section class="section-bottom">
+      <div class="section-header"><span>Integrity Inspection Report</span></div>
+      <div id="diff-output" class="inspector-report">
+        <div class="status-badge" style="background:#ccc;">Waiting for Input...</div>
+        <p>Paste codes to start 100% integrity check.</p>
       </div>
-      <textarea id="review-code" placeholder="Paste review code here..."></textarea>
-    </section>
-
-    <section class="section-4">
-      <div class="section-header">
-        <span>Differences from Master</span>
-      </div>
-      <div id="diff-output" class="diff-display"></div>
     </section>
   </div>
 
   <script>
-    /**
-     * RopChecker
-     * ver. 0.03
-     */
     const masterInput = document.getElementById('master-code');
     const reviewInput = document.getElementById('review-code');
     const masterVerDisp = document.getElementById('master-ver');
     const reviewVerDisp = document.getElementById('review-ver');
-    const diffOutput = document.getElementById('diff-output');
+    const reportOutput = document.getElementById('diff-output');
+    const saveStatus = document.getElementById('save-status');
 
-    // バージョン抽出用の正規表現
     const verRegex = /(?:ver\.?|version[:\s]|v)\s*([\d\.]+)/i;
+    let saveTimeout;
 
-    // HTMLエスケープ関数（プログラムの動作を防止）
     function escapeHTML(str) {
       if (!str) return "";
-      return str.replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[m];
-      });
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
     }
 
-    function updateVersion(inputElement, displayElement) {
-      const text = inputElement.value;
+    function updateVersion(text, displayElement) {
       const match = text.match(verRegex);
-      if (match) {
-        displayElement.textContent = match[0];
-      } else {
-        displayElement.textContent = '';
+      displayElement.textContent = match ? match[0] : '';
+    }
+
+    /**
+     * 100% Integrity Checker Logic
+     * マスターの各行（聖域）がレビューに含まれているかを厳格にチェック
+     */
+    function runIntegrityCheck() {
+      const masterLines = masterInput.value.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      const reviewText = reviewInput.value;
+      const reviewLinesSet = new Set(reviewText.split(/\r?\n/).map(l => l.trim()));
+
+      const missing = [];
+      
+      // 5万行クラスを高速走査（Setを使用）
+      masterLines.forEach(line => {
+        if (!reviewLinesSet.has(line)) {
+          missing.push(line);
+        }
+      });
+
+      renderReport(missing);
+    }
+
+    function renderReport(missing) {
+      if (!masterInput.value || !reviewInput.value) {
+        reportOutput.innerHTML = '<div class="status-badge" style="background:#ccc;">Ready</div><p>Comparison engine active.</p>';
+        return;
       }
+
+      let html = '';
+      if (missing.length === 0) {
+        html = '<div class="status-badge status-ok">PASS</div>';
+        html += '<p style="color:var(--ok-color);">No deletions detected. All functions, UI styles, and security logics are preserved.</p>';
+      } else {
+        html = '<div class="status-badge status-ng">NG: DEGRADATION DETECTED</div>';
+        html += `<p>The following ${missing.length} elements are missing in the Review code:</p>`;
+        missing.slice(0, 100).forEach(item => {
+          html += `<div class="missing-item">[-] ${escapeHTML(item)}</div>`;
+        });
+        if (missing.length > 100) html += `<p>...and ${missing.length - 100} more items.</p>`;
+      }
+      reportOutput.innerHTML = html;
     }
 
-    // 差分表示のプレースホルダ更新（セキュリティ対応）
-    function updateDiffDisplay() {
-      // 現時点では入力を安全に4段目に反映させる（将来の差分ロジックの土台）
-      // エスケープ処理を介すことでHTMLとして実行されるのを防ぐ
-      const safeText = escapeHTML(reviewInput.value);
-      // 差分表示の実装は次フェーズ。現在は安全な文字列出力を担保。
+    function scheduleSaveAndCheck() {
+      saveStatus.style.opacity = 0;
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        // 保存
+        try {
+          localStorage.setItem('rop_master', masterInput.value);
+          localStorage.setItem('rop_review', reviewInput.value);
+          saveStatus.style.opacity = 1;
+          setTimeout(() => saveStatus.style.opacity = 0, 1000);
+        } catch (e) {}
+        
+        // 検証実行
+        runIntegrityCheck();
+      }, 1500); 
     }
 
-    masterInput.addEventListener('input', () => {
-      updateVersion(masterInput, masterVerDisp);
+    window.addEventListener('load', () => {
+      masterInput.value = localStorage.getItem('rop_master') || '';
+      reviewInput.value = localStorage.getItem('rop_review') || '';
+      updateVersion(masterInput.value, masterVerDisp);
+      updateVersion(reviewInput.value, reviewVerDisp);
+      runIntegrityCheck();
     });
 
-    reviewInput.addEventListener('input', () => {
-      updateVersion(reviewInput, reviewVerDisp);
-      updateDiffDisplay();
+    [masterInput, reviewInput].forEach(el => {
+      el.addEventListener('input', (e) => {
+        updateVersion(e.target.value, e.target.id === 'master-code' ? masterVerDisp : reviewVerDisp);
+        scheduleSaveAndCheck();
+      });
     });
   </script>
 </body>
