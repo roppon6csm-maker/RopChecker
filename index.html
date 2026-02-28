@@ -84,8 +84,8 @@
             let blocks = [];
             
             // ロジック1: バッククォートがあれば抜き出す
-            if (bulkText.includes('```')) {
-                const matched = bulkText.match(/```(?:[a-z]*)\n?([\s\S]*?)```/g);
+            if (bulkText.includes('```/g);
+                if (matched) blocks = matched.map(b => b.replace(/```(?:[a-z]*)\n?([\s\S]*?)```/g);
                 if (matched) {
                     blocks = matched.map(b => b.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim());
                 }
