@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>真コーティングパートナー：合体検知器</title>
+    <title>RopMarge</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: sans-serif; padding: 15px; background: #f0f2f5; color: #333; margin: 0; line-height: 1.5; }
         .container { max-width: 600px; margin: 0 auto; }
-        textarea { width: 100%; height: 120px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; padding: 10px; font-size: 16px; display: block; }
-        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        textarea { width: 100%; height: 120px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; padding: 10px; font-size: 16px; display: block; background: #f9f9f9; color: #333; }
+        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .result { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; }
         .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         #outputCode { white-space: pre-wrap; background: #fff; padding: 10px; border: 1px solid #ddd; margin-top: 10px; font-family: monospace; font-size: 12px; height: 200px; overflow-y: scroll; }
-        /* プレビューモーダル */
         #previewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; border: none; }
         #closePreview { position: fixed; top: 10px; right: 10px; width: 44px; height: 44px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; font-size: 24px; font-weight: bold; z-index: 10001; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
@@ -22,69 +21,109 @@
 <body>
 <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h2 style="margin: 0;">🛠 コード合体・検知機</h2>
+        <h2 style="margin: 0;">RopMarge</h2>
         <button onclick="copyProtocol()" style="width: auto; padding: 5px 10px; font-size: 8px; line-height: 1.2; background: #6f42c1; color: white; border-radius: 6px;">
             最初にGeminiに<br>貼り付ける文言をコピー
         </button>
     </div>
     
-    <label>1. マスターコード（現在の全コード）</label>
-    <textarea id="masterCode" placeholder="ここに元のコードを貼り付け" readonly onclick="if(this.value === '') this.readOnly = false" onblur="this.readOnly = true"></textarea>
-
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
-        <label style="flex: 1;">2. AIが出した「修正箇所」の指定</label>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-            <button onclick="pasteTo('searchStr')" style="width: 70px; padding: 4px 0; background: #007bff; color: white; font-size: 11px; border-radius: 4px; border: none;">貼り付け</button>
-            <button onclick="document.getElementById('searchStr').value=''" style="width: 70px; padding: 4px 0; background: #6c757d; color: white; font-size: 11px; border-radius: 4px; border: none;">クリア</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <label>1. マスターコード（現在の全コード）</label>
+        <div style="display: flex; gap: 5px;">
+            <button onclick="pasteTo('masterCode')" style="width: auto; padding: 5px 12px; background: #007bff; color: white; font-size: 9px; border-radius: 4px; border: none;">貼り付け</button>
+            <button onclick="document.getElementById('masterCode').value=''" style="width: auto; padding: 5px 12px; background: #6c757d; color: white; font-size: 9px; border-radius: 4px; border: none;">クリア</button>
         </div>
     </div>
-    <textarea id="searchStr" placeholder="[貼り付け] ボタンで入力" readonly></textarea>
+    <textarea id="masterCode" placeholder="[貼り付け] ボタンで入力" readonly></textarea>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
-        <label style="flex: 1;">3. AIが出した「新しいパーツ」</label>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-            <button onclick="pasteTo('replaceStr')" style="width: 70px; padding: 4px 0; background: #007bff; color: white; font-size: 11px; border-radius: 4px; border: none;">貼り付け</button>
-            <button onclick="document.getElementById('replaceStr').value=''" style="width: 70px; padding: 4px 0; background: #6c757d; color: white; font-size: 11px; border-radius: 4px; border: none;">クリア</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <label style="font-weight: bold;">2. AIの回答をそのまま貼り付け</label>
+        <div style="display: flex; gap: 5px;">
+            <button onclick="pasteTo('bulkInput')" style="width: auto; padding: 5px 12px; background: #007bff; color: white; font-size: 9px; border-radius: 4px; border: none;">貼り付け</button>
+            <button onclick="document.getElementById('bulkInput').value=''" style="width: auto; padding: 5px 12px; background: #6c757d; color: white; font-size: 9px; border-radius: 4px; border: none;">クリア</button>
         </div>
     </div>
-    <textarea id="replaceStr" placeholder="[貼り付け] ボタンで入力" readonly></textarea>
+    <textarea id="bulkInput" style="height: 180px;" placeholder="AIの回答全文を貼り付け" readonly></textarea>
 
     <button onclick="processCode()">安全に合体させる</button>
 
     <div id="status" class="result"></div>
     <div id="outputContainer" style="display:none;">
-        <label>完成したコード（コピーして保存してください）</label>
-        <button onclick="navigator.clipboard.writeText(document.getElementById('outputCode').innerText)" style="width: auto; padding: 5px 15px; background: #28a745; margin-bottom: 5px;">このコードをコピー</button>
-        <button onclick="openPreview()" style="width: auto; padding: 5px 15px; background: #17a2b8; color: white; margin-bottom: 5px; border: none; border-radius: 4px;">全画面プレビュー</button>
+        <label>完成したコード（合体結果）</label>
+        <button onclick="copyOutput()" style="width: auto; padding: 8px 15px; background: #28a745; margin-bottom: 5px; font-size: 14px;">このコードをコピー</button>
+        <button onclick="openPreview()" style="width: auto; padding: 8px 15px; background: #17a2b8; color: white; margin-bottom: 5px; border: none; border-radius: 4px; font-size: 14px;">全画面プレビュー</button>
         <div id="outputCode"></div>
     </div>
     <iframe id="previewModal"></iframe>
     <button id="closePreview" style="display:none;" onclick="closePreview()">×</button>
 
     <script>
+        async function pasteTo(id) {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById(id).value = text;
+            } catch (err) {
+                alert("貼り付け失敗。設定を確認してください。");
+            }
+        }
+
+        function copyOutput() {
+            const code = document.getElementById('outputCode').innerText;
+            navigator.clipboard.writeText(code).then(() => alert("コピー完了！"));
+        }
+
         function processCode() {
             const master = document.getElementById('masterCode').value;
-            const search = document.getElementById('searchStr').value;
-            const replace = document.getElementById('replaceStr').value;
+            const bulkText = document.getElementById('bulkInput').value;
             const status = document.getElementById('status');
             const outputContainer = document.getElementById('outputContainer');
             const outputCode = document.getElementById('outputCode');
 
-            if (!master.includes(search)) {
-                status.innerHTML = "❌ 【検知失敗】AIが指定した「古い文字列」がマスターコード内に見つかりません。余計な改変や認識ミスがある可能性があるため、合体を中止しました。";
+            if (!master || !bulkText) return;
+
+            let blocks = [];
+            if (bulkText.includes('```')) {
+                blocks = bulkText.match(/```(?:[a-z]*)\n?([\s\S]*?)```/g).map(b => b.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim());
+            } else {
+                blocks = bulkText.split(/部品[AB]（修正[前後]）：/g).map(b => b.trim()).filter(b => b !== '');
+            }
+            
+            if (blocks.length < 2) {
+                status.innerHTML = "❌ 修正セットがうまく読み取れませんでした。";
                 status.className = "result error";
                 status.style.display = "block";
-                outputContainer.style.display = "none";
                 return;
             }
 
-            const updated = master.replace(search, replace);
-            
-            status.innerHTML = "✅ 【合体成功】指定箇所のみを正確に書き換えました。他の場所は1文字も触れていません。";
-            status.className = "result success";
-            status.style.display = "block";
-            outputCode.innerText = updated;
-            outputContainer.style.display = "block";
+            let updated = master;
+            let successCount = 0;
+            let errors = [];
+
+            for (let i = 0; i < blocks.length; i += 2) {
+                if (i + 1 >= blocks.length) break;
+                const search = blocks[i];
+                const replace = blocks[i+1];
+
+                if (updated.includes(search)) {
+                    updated = updated.split(search).join(replace);
+                    successCount++;
+                } else {
+                    errors.push(`${Math.floor(i/2) + 1}番目のセットが不一致`);
+                }
+            }
+
+            if (successCount > 0) {
+                status.innerHTML = `✅ ${successCount}箇所の合体に成功！`;
+                if (errors.length > 0) status.innerHTML += `<br>⚠️ 失敗: ${errors.join(' ')}`;
+                status.className = "result success";
+                status.style.display = "block";
+                outputCode.innerText = updated;
+                outputContainer.style.display = "block";
+            } else {
+                status.innerHTML = "❌ 合体できる箇所がありませんでした。";
+                status.className = "result error";
+                status.style.display = "block";
+            }
         }
 
         function openPreview() {
@@ -92,11 +131,8 @@
             const modal = document.getElementById('previewModal');
             const closeBtn = document.getElementById('closePreview');
             const doc = modal.contentDocument || modal.contentWindow.document;
-            doc.open();
-            doc.write(code);
-            doc.close();
-            modal.style.display = 'block';
-            closeBtn.style.display = 'block';
+            doc.open(); doc.write(code); doc.close();
+            modal.style.display = 'block'; closeBtn.style.display = 'block';
         }
 
         function closePreview() {
@@ -104,30 +140,10 @@
             document.getElementById('closePreview').style.display = 'none';
         }
 
-        async function pasteTo(id) {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById(id).value = text;
-            } catch (err) {
-                alert("貼り付けに失敗しました。ブラウザの設定で貼り付けを許可してください。");
-            }
-        }
-
         function copyProtocol() {
-            const protocol = `あなたは私の「真のコーティングパートナー」です。
-以下の「パーツ納品プロトコル」を厳守してください。
-
-【実行プロトコル】
-1. ソースコード全文を出力することは厳禁です。
-2. あなたの仕事は、コードを合体させるための「2つの部品」を提示することです。
-   - 部品A（修正箇所の指定）：修正前の古いコードを、前後数行を含めて正確に抜き出したもの。
-   - 部品B（新しいパーツ）：修正後の新しいコード。
-3. 部品Aは、私のマスターコードにある文字列と「1文字（スペースや改行含む）の狂いもなく」一致させてください。
-4. 私が「コード合体・検知機」にこれらを貼り付けた際、不一致でエラーが出ることを最大の恥としてください。
-
-準備ができたら「マスターコードを読み込みます。貼り付けてください」とだけ返答してください。`;
+            const protocol = `あなたは私の「真のコーティングパートナー」です。以下の「一括パーツ納品プロトコル」を厳守してください。\n\n【実行プロトコル】\n1. ソースコード全文を出力することは厳禁です。\n2. 修正箇所は必ず「セット」で提示してください。\n - 部品A（修正前）：修正箇所を1文字の狂いもなく抜き出したもの。\n - 部品B（修正後）：新しいコード。\n3. 修正が複数ある場合はセットを順番に並べてください。\n4. 回答全文をコピーして「RopMarge」に貼り付けるため、不一致エラーを最大の恥としてください。\n\n承認が必要な場合はコードを書かずに待機し、私が「🙋‍♀️」と送ったらこのプロトコルに従って部品を提示してください。\n\n準備ができたら「マスターコードを読み込みます。貼り付けてください」とだけ返答してください。`;
             navigator.clipboard.writeText(protocol).then(() => {
-                alert("プロトコルをコピーしました。Geminiに貼り付けてください。");
+                alert("プロトコルをコピーしました。");
             });
         }
     </script>
