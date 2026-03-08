@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ハピボルーレット ver.1.6.3</title>
+    <title>ハピボルーレット ver.1.9.0</title>
     
     <script>
         const imgUrls = [
@@ -11,8 +11,8 @@
             "https://i.imgur.com/rnoZlTb.jpeg", "https://i.imgur.com/WVA6hdU.jpeg", "https://i.imgur.com/qT7Cbn3.jpeg",
             "https://i.imgur.com/Pq8kdam.jpeg", "https://i.imgur.com/F84QLmL.png", "https://i.imgur.com/bSPZH8v.png",
             "https://i.imgur.com/zsVs8tV.png", "https://i.imgur.com/QoEnzAy.png", "https://i.imgur.com/wUXQD9g.png",
-            "https://i.imgur.com/sDvV2zp.png", "https://i.imgur.com/0nr5ml8.png", "https://i.imgur.com/JmxbMui.png",
-            "https://i.imgur.com/R6OY57k.png", "https://i.imgur.com/skWZ5bB.png"
+            "https://i.imgur.com/sDvV2zp.png", "https://i.imgur.com/0nr5ml8.png", "https://i.imgur.com/R6OY57k.png",
+            "https://i.imgur.com/skWZ5bB.png"
         ];
         Promise.all(imgUrls.map(url => {
             return new Promise((resolve) => {
@@ -22,41 +22,35 @@
                 img.src = url;
             });
         }));
+        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        document.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     </script>
 
     <style>
-        /* ############################################################
-           ⚠️ [STRICT BLOCK: UI_DESIGN_SYSTEM] ⚠️ 改変・削除を厳禁。
-           ############################################################ */
         :root { --bg-color: #f1f1f1; --slot-machine-color: #341f97; --accent-color: #eccc68; --text-color-dark: #333; }
         * { box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
         body { background-color: var(--bg-color); color: var(--text-color-dark); font-family: sans-serif; text-align: center; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         .settings-trigger { position: absolute; top: 10px; right: 10px; z-index: 200; font-size: 24px; cursor: pointer; opacity: 0.4; }
         .version-display { position: absolute; top: 10px; right: 45px; z-index: 200; font-size: 10px; opacity: 0.5; color: var(--text-color-dark); }
         .banner-container { width: 100%; max-width: 500px; margin: 0 auto; min-height: 50px; }
         .banner-container img { width: 100%; height: auto; display: block; border: none; }
-        
-        /* 🏆 当選者枠の固定 (4x2, 10px) */
         .winner-board { background: rgba(255,255,255,0.8); margin: 10px auto; padding: 10px; border-radius: 8px; width: 94%; max-width: 480px; border: 1px solid #ccc; box-sizing: border-box; min-height: 80px; }
         .winner-grid { display: grid; gap: 5px; text-align: left; grid-template-columns: repeat(2, 1fr); font-size: 10px; }
         .winner-item { border-left: 3px solid var(--accent-color); background: rgba(236,204,104,0.1); padding-left: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.5em; line-height: 1.5em; }
-        
         .slot-machine { background: var(--slot-machine-color); border: 6px solid var(--accent-color); border-radius: 15px; width: 94%; max-width: 480px; margin: 15px auto; padding: 15px 5px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .reels-container { display: flex; justify-content: space-around; background: #000; padding: 8px; border-radius: 10px; height: 25vw; max-height: 120px; border: 2px solid #57606f; box-sizing: border-box; }
         .reel-window { width: 30%; height: 100%; background: #fff; border-radius: 5px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .reel-strip { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-direction: column; }
         .symbol { height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .symbol img { max-height: 90%; max-width: 90%; object-fit: contain; }
-        
         @keyframes spin { from { transform: translateY(0); } to { transform: translateY(-300%); } }
         .spinning { animation: spin 0.3s linear infinite; }
-        
         .stop-buttons { display: flex; justify-content: space-around; margin-top: 15px; }
         .stop-btn { width: 28%; padding: 12px 0; background: #ecf0f1; border: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px #bdc3c7; color: #333; cursor: pointer; font-size: 16px; }
         .stop-btn:disabled { background: #7f8c8d; color: #95a5a6; box-shadow: none; transform: translateY(2px); }
         .start-btn { background: #ff4757; color: #fff; border: none; padding: 15px 0; width: 90%; max-width: 320px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 5px 0 #b33939; cursor: pointer; margin-top: 10px; }
         .start-btn:disabled { background: #7f8c8d; box-shadow: none; transform: translateY(4px); }
-        
         canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; color: #333; text-align: left; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -68,15 +62,13 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #2196F3; }
         input:checked + .slider:before { transform: translateX(26px); }
-
         .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; pointer-events: auto; }
         .result-content { width: 90%; max-width: 400px; padding: 30px 10px; border-radius: 20px; text-align: center; animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; margin-top: -100px; }
         @keyframes modalPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .result-title { font-weight: bold; white-space: nowrap; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .result-images { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
         .result-images img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); background: #fff; }
-        .close-result-btn { background: #333; color: #fff; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #000; }
-        
+        .close-result-btn { background: #333; color: #fff; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px #000; }
         .res-bigwin { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border: 4px solid #fff; box-shadow: 0 0 30px #f6d365; }
         .res-smallwin { background: linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%); border: 4px solid #fff; box-shadow: 0 0 20px #fff; }
         .res-lose { background: #fff; border: 4px solid #ccc; }
@@ -84,9 +76,8 @@
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <div class="version-display">ver.1.6.3</div>
+    <div class="version-display">ver.1.9.0</div>
     <div class="settings-trigger" onclick="openModal()">⚙️</div>
-    
     <div id="resultOverlay" class="result-overlay">
         <div id="resultContent" class="result-content">
             <div id="resultText" class="result-title"></div>
@@ -94,7 +85,6 @@
             <button class="close-result-btn" onclick="closeResultModal()">閉じる</button>
         </div>
     </div>
-
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
             <div class="modal-close" onclick="closeModal()">×</div>
@@ -105,44 +95,33 @@
                 <div style="margin-bottom:10px;"><label style="font-weight:bold;">表示形式（行×列）</label><br><input type="number" id="set-rows" style="width:40%;"> × <input type="number" id="set-cols" style="width:40%;"></div>
                 <div style="margin-bottom:5px;"><label style="font-weight:bold;">文字サイズ(px)</label><input type="number" id="set-font" style="width:100%;"></div>
             </div>
-
             <div style="border-bottom: 1px solid #eee; margin-bottom: 15px; padding-bottom: 10px;">
                 <p><b>確率設定</b></p>
                 <div style="font-size: 12px; margin-bottom: 10px;">合計<span id="prob-total" style="font-weight:bold;">100</span>％</div>
-                <div style="display:flex; align-items:center; margin-bottom:8px;">
-                    <span style="flex:1; font-weight:bold;">大当たり</span>
-                    <input type="number" id="set-win-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％ 
-                    上限<input type="number" id="set-win-l" oninput="calcProb()" style="width:40px;" inputmode="numeric">本
-                </div>
-                <div style="display:flex; align-items:center; margin-bottom:8px;">
-                    <span style="flex:1; font-weight:bold;">小当たり</span>
-                    <input type="number" id="set-small-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％ 
-                    上限<input type="number" id="set-small-l" oninput="calcProb()" style="width:40px;" inputmode="numeric">本
-                </div>
-                <div style="display:flex; align-items:center;">
-                    <span style="flex:1; font-weight:bold;">ハズレ</span>
-                    <input type="number" id="set-lose-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％
-                    上限<input type="text" value="なし" disabled style="width:40px; background:#eee; text-align:center;">本
+                <div style="display:flex; align-items:center; margin-bottom:8px;"><span style="flex:1; font-weight:bold;">大当たり</span><input type="number" id="set-win-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％ 上限<input type="number" id="set-win-l" oninput="calcProb()" style="width:40px;" inputmode="numeric">本</div>
+                <div style="display:flex; align-items:center; margin-bottom:8px;"><span style="flex:1; font-weight:bold;">小当たり</span><input type="number" id="set-small-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％ 上限<input type="number" id="set-small-l" oninput="calcProb()" style="width:40px;" inputmode="numeric">本</div>
+                <div style="display:flex; align-items:center;"><span style="flex:1; font-weight:bold;">ハズレ</span><input type="number" id="set-lose-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％ 上限<input type="text" value="なし" disabled style="width:40px; background:#eee; text-align:center;">本</div>
+            </div>
+            <div style="border-bottom: 1px solid #eee; margin-bottom: 15px; padding-bottom: 10px;">
+                <p><b>リール設定</b></p>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="font-weight:bold;">回転速度</span>
+                    <select id="set-speed" style="padding:5px; border-radius:5px;">
+                        <option value="0.1">0.1s (爆速)</option><option value="0.2">0.2s</option><option value="0.3">0.3s (標準)</option>
+                        <option value="0.4">0.4s</option><option value="0.5">0.5s</option><option value="0.6">0.6s</option>
+                        <option value="0.7">0.7s</option><option value="0.8">0.8s</option><option value="0.9">0.9s</option><option value="1.0">1.0s (低速)</option>
+                    </select>
                 </div>
             </div>
-
-            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-weight:bold;">パスワード設定</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-
             <button id="saveBtn" onclick="applySettings()" style="width:100%; padding:12px; background:#27ae60; color:#fff; border:none; border-radius:8px; font-weight:bold;">保存して適用</button>
         </div>
     </div>
-    
     <canvas id="confetti"></canvas>
     <div class="banner-container"><img src="https://i.imgur.com/skWZ5bB.png" alt="Banner"></div>
-    
     <div class="winner-board">
         <div id="wb-title" style="font-size: 0.8rem; color: #666; margin-bottom: 5px; font-weight: bold;">🏆</div>
         <div id="winnerList" class="winner-grid"></div>
     </div>
-
     <div class="slot-machine">
         <div class="reels-container">
             <div class="reel-window"><div id="strip1" class="reel-strip"></div></div>
@@ -159,295 +138,105 @@
             <button id="drawBtn" class="start-btn" onclick="startSlot()">スタート</button>
         </div>
     </div>
-
 <script>
-    /* ############################################################
-       ⚠️ [BLOCK: DATA_AND_LOGIC_CORE] ⚠️ 変更厳禁。
-       ############################################################ */
     const API_URL = "https://script.google.com/macros/s/AKfycbw9hlHzP4p5rDA2vlGClhDchnjYPw_TXq4uwu-xDql6i7MW5Fmfe-9Iz8kguCvyawH6QQ/exec";
-    
-    const imgs = {
-        "ハ": "https://i.imgur.com/dyeH1D6.jpeg", "ピ": "https://i.imgur.com/Q4h6Sdv.jpeg", "ボ": "https://i.imgur.com/xFq6HON.jpeg",
-        "ク": "https://i.imgur.com/rnoZlTb.jpeg", "ー": "https://i.imgur.com/WVA6hdU.jpeg", "ス": "https://i.imgur.com/qT7Cbn3.jpeg",
-        "ツ": "https://i.imgur.com/Pq8kdam.jpeg", "緑": "https://i.imgur.com/F84QLmL.png", "赤": "https://i.imgur.com/bSPZH8v.png",
-        "白": "https://i.imgur.com/zsVs8tV.png", "紫": "https://i.imgur.com/QoEnzAy.png", "ピンク": "https://i.imgur.com/wUXQD9g.png",
-        "青": "https://i.imgur.com/sDvV2zp.png", "黄": "https://i.imgur.com/0nr5ml8.png", "オレンジ": "https://i.imgur.com/R6OY57k.png"
-    };
+    const imgs = { "ハ": "https://i.imgur.com/dyeH1D6.jpeg", "ピ": "https://i.imgur.com/Q4h6Sdv.jpeg", "ボ": "https://i.imgur.com/xFq6HON.jpeg", "ク": "https://i.imgur.com/rnoZlTb.jpeg", "ー": "https://i.imgur.com/WVA6hdU.jpeg", "ス": "https://i.imgur.com/qT7Cbn3.jpeg", "ツ": "https://i.imgur.com/Pq8kdam.jpeg", "緑": "https://i.imgur.com/F84QLmL.png", "赤": "https://i.imgur.com/bSPZH8v.png", "白": "https://i.imgur.com/zsVs8tV.png", "紫": "https://i.imgur.com/QoEnzAy.png", "ピンク": "https://i.imgur.com/wUXQD9g.png", "青": "https://i.imgur.com/sDvV2zp.png", "黄": "https://i.imgur.com/0nr5ml8.png", "オレンジ": "https://i.imgur.com/R6OY57k.png" };
     const girlColors = ["緑", "赤", "白", "紫", "ピンク", "青", "黄", "オレンジ"];
-    const dummyKeys = Object.keys(imgs);
-    const dummyImgs = Object.values(imgs);
-
+    const dummyKeys = Object.keys(imgs); const dummyImgs = Object.values(imgs);
     let resultData = null; let stoppedCount = 0; let isProcessing = false;
-    let config = { 
-        title: "🏆", rows: 4, cols: 2, fontSize: 10,
-        winP: 10, winL: 7, smallP: 10, smallL: 7, loseP: 80
-    };
-    let currentWinners = []; // サーバーから返ってくる [{name, type}, ...] 形式を想定
-    let sessionStopChars = ["", "", ""];
+    let config = { title: "🏆", rows: 4, cols: 2, fontSize: 10, winP: 10, winL: 7, smallP: 10, smallL: 7, loseP: 80, spinSpeed: 0.3 };
+    let currentWinners = []; let sessionStopChars = ["", "", ""];
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 2000);
-    }
-
+    function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 2000); }
     function initReels() {
         const reelHeight = document.querySelector('.reel-window').offsetHeight;
         for(let i=1; i<=3; i++) {
-            const strip = document.getElementById('strip'+i);
-            let html = '';
-            for(let j=0; j<10; j++) {
-                const src = dummyImgs[Math.floor(Math.random() * dummyImgs.length)];
-                html += `<div class="symbol" style="height:${reelHeight}px;"><img src="${src}"></div>`;
-            }
+            const strip = document.getElementById('strip'+i); let html = '';
+            for(let j=0; j<10; j++) { const src = dummyImgs[Math.floor(Math.random() * dummyImgs.length)]; html += `<div class="symbol" style="height:${reelHeight}px;"><img src="${src}"></div>`; }
             strip.innerHTML = html;
         }
     }
-
     async function startSlot() {
         if (isProcessing) return;
-        const rawName = document.getElementById('nameInput').value.trim();
-        const name = rawName.replace(/<[^>]*>?/gm, '');
+        const name = document.getElementById('nameInput').value.trim().replace(/<[^>]*>?/gm, '');
         if (!name) return alert("名前を入れてね！");
-        
-        isProcessing = true;
-        const drawBtn = document.getElementById('drawBtn');
-        drawBtn.innerText = "通信中...";
-        drawBtn.disabled = true;
-
+        isProcessing = true; resultData = null;
+        const drawBtn = document.getElementById('drawBtn'); drawBtn.innerText = "通信中..."; drawBtn.disabled = true;
         try {
             const res = await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=check`);
             resultData = await res.json();
-            
             const isBigWin = (resultData.result === "当たり");
-            const isSmallWin = (!isBigWin && Math.random() < 0.15); 
-
-            if (isBigWin) {
-                sessionStopChars = ["ハ", "ピ", "ボ"];
-                // C列書き分け: type=大当たり
-                await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm&type=${encodeURIComponent("大当たり")}`);
-            } else if (isSmallWin) {
-                const color = girlColors[Math.floor(Math.random() * girlColors.length)];
-                sessionStopChars = [color, color, color];
-                // C列書き分け: type=小当たり
-                await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm&type=${encodeURIComponent("小当たり")}`);
-            } else {
-                do {
-                    sessionStopChars = [
-                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)],
-                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)],
-                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)]
-                    ];
-                } while (
-                    (sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2]) ||
-                    (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ")
-                );
-            }
-
-            drawBtn.innerText = "スタート";
-            stoppedCount = 0;
+            const isSmallWin = (resultData.result === "小当たり"); 
+            if (isBigWin) { sessionStopChars = ["ハ", "ピ", "ボ"]; }
+            else if (isSmallWin) { const color = girlColors[Math.floor(Math.random() * girlColors.length)]; sessionStopChars = [color, color, color]; }
+            else { do { sessionStopChars = [dummyKeys[Math.floor(Math.random() * dummyKeys.length)], dummyKeys[Math.floor(Math.random() * dummyKeys.length)], dummyKeys[Math.floor(Math.random() * dummyKeys.length)]]; } while ((sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2]) || (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ")); }
+            
+            document.querySelectorAll('.reel-strip').forEach(s => s.style.animationDuration = config.spinSpeed + 's');
             for(let i=0; i<3; i++) document.getElementById('strip'+(i+1)).classList.add('spinning');
             for(let i=1; i<=3; i++) document.getElementById('stop'+i).disabled = false;
-
-        } catch (e) {
-            alert("通信エラーにより当選が確定できませんでした。運営に問い合わせてください。");
-            isProcessing = false;
-            drawBtn.disabled = false;
-            drawBtn.innerText = "スタート";
-        }
+            drawBtn.innerText = "回転中...";
+        } catch (e) { alert("エラーが発生しました。"); isProcessing = false; drawBtn.disabled = false; drawBtn.innerText = "スタート"; }
     }
-
     function handleStop(index) {
-        const strip = document.getElementById('strip' + (index + 1));
-        const btn = document.getElementById('stop' + (index + 1));
+        const strip = document.getElementById('strip' + (index + 1)); const btn = document.getElementById('stop' + (index + 1));
         const reelHeight = document.querySelector('.reel-window').offsetHeight;
-        btn.disabled = true;
-        strip.classList.remove('spinning');
+        btn.disabled = true; strip.classList.remove('spinning');
         const finalChar = sessionStopChars[index];
         strip.innerHTML = `<div class="symbol" style="height:${reelHeight}px;"><img src="${imgs[finalChar]}"></div>`;
-        stoppedCount++; if (stoppedCount === 3) setTimeout(finish, 500);
+        stoppedCount++; if (stoppedCount === 3) finish();
     }
-
-    function finish() {
+    async function finish() {
         const isBig = (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ");
         const isSmall = (!isBig && sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2] && girlColors.includes(sessionStopChars[0]));
-
-        const overlay = document.getElementById('resultOverlay');
-        const content = document.getElementById('resultContent');
-        const text = document.getElementById('resultText');
-        const imgDiv = document.getElementById('resultImages');
-
-        content.className = 'result-content';
-        imgDiv.innerHTML = sessionStopChars.map(c => `<img src="${imgs[c]}">`).join('');
+        const typeStr = isBig ? "大当たり" : (isSmall ? "小当たり" : "はずれ");
         
-        const vw = window.innerWidth / 100;
-        text.style.fontSize = (vw * 8) + "px";
-
-        if (isBig) {
-            content.classList.add('res-bigwin');
-            text.innerText = "大当たり！おめでとう！";
-            startConfetti();
-        } else if (isSmall) {
-            content.classList.add('res-smallwin');
-            text.innerText = "当たり！おめでとう！";
-            startConfetti();
-        } else {
-            content.classList.add('res-lose');
-            text.innerText = "ハズレ…残念";
-            text.style.color = "#666";
-        }
-
-        overlay.style.display = 'flex';
-        updateWinners();
-    }
-
-    function closeResultModal() {
-        document.getElementById('resultOverlay').style.display = 'none';
-        resetMachine();
-    }
-
-    function resetMachine() {
-        isProcessing = false; resultData = null; sessionStopChars = ["", "", ""];
-        document.getElementById('drawBtn').disabled = false;
-        document.getElementById('nameInput').value = "";
-        for(let i=1; i<=3; i++) document.getElementById('stop'+i).disabled = true;
-        initReels();
-    }
-
-    async function updateWinners() {
+        // 🚨 ver.1.9.0: はずれの時も必ず confirm を送り、全件ログを残す
         try {
-            const res = await fetch(`${API_URL}?action=getBoard`);
-            const data = await res.json();
-            currentWinners = data.winners || []; // サーバーからは [{name:"...", type:"大当たり"}, ...] が来ると想定
-            if (data.config) {
-                Object.assign(config, data.config);
-            }
-            renderWinnerBoard();
-        } catch (e) {}
+            const name = document.getElementById('nameInput').value.trim();
+            await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm&type=${encodeURIComponent(typeStr)}`);
+        } catch(e) { console.error("GAS記録エラー", e); }
+        
+        const overlay = document.getElementById('resultOverlay'); const text = document.getElementById('resultText'); const imgDiv = document.getElementById('resultImages'); const content = document.getElementById('resultContent');
+        content.className = 'result-content'; imgDiv.innerHTML = sessionStopChars.map(c => `<img src="${imgs[c]}">`).join('');
+        text.style.fontSize = (window.innerWidth / 100 * 8) + "px";
+        if (isBig) { content.classList.add('res-bigwin'); text.innerText = "大当たり！おめでとう！"; startConfetti(); }
+        else if (isSmall) { content.classList.add('res-smallwin'); text.innerText = "当たり！おめでとう！"; startConfetti(); }
+        else { content.classList.add('res-lose'); text.innerText = "ハズレ…残念"; text.style.color = "#666"; }
+        overlay.style.display = 'flex'; updateWinners();
     }
-
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; resetMachine(); }
+    function resetMachine() { isProcessing = false; stoppedCount = 0; document.getElementById('drawBtn').disabled = false; document.getElementById('drawBtn').innerText = "スタート"; document.getElementById('nameInput').value = ""; for(let i=1; i<=3; i++) document.getElementById('stop'+i).disabled = true; initReels(); }
+    async function updateWinners() { try { const res = await fetch(`${API_URL}?action=getBoard`); const data = await res.json(); currentWinners = data.winners || []; if (data.config) { config = {...config, ...data.config}; } renderWinnerBoard(); } catch (e) {} }
     function renderWinnerBoard() {
-        const list = document.getElementById('winnerList');
-        if(!list) return;
-        
-        // レイアウト固定
-        list.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
-        list.style.fontSize = `${config.fontSize}px`;
-        document.getElementById('wb-title').innerText = config.title;
-
-        // 小当たりを除外し、大当たり（type === "大当たり"）のみを抽出
-        // サーバーが単純な文字列配列を返す場合は、API側で選別済みである必要がありますが、
-        // フロントでも安全のためにフィルタリングします。
-        const bigWinnersOnly = currentWinners.filter(w => {
-            if (typeof w === 'string') return true; // 互換性維持
-            return w.type === "大当たり";
-        }).map(w => typeof w === 'string' ? w : w.name);
-
-        let html = '';
-        const rowsCount = parseInt(config.rows) || 4;
-        const colsCount = parseInt(config.cols) || 2;
-        const totalSlots = rowsCount * colsCount;
-        
-        for (let k = 0; k < totalSlots; k++) {
-            const name = bigWinnersOnly[k] || "";
-            html += `<div class="winner-item">${name ? '🎊 ' + name : ''}</div>`;
-        }
+        const list = document.getElementById('winnerList'); if(!list) return;
+        list.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`; list.style.fontSize = `${config.fontSize}px`; document.getElementById('wb-title').innerText = config.title;
+        const bigWinnersOnly = currentWinners.filter(w => (typeof w === 'string') || w.type === "大当たり").map(w => typeof w === 'string' ? w : w.name);
+        let html = ''; const totalSlots = (parseInt(config.rows) || 4) * (parseInt(config.cols) || 2);
+        for (let k = 0; k < totalSlots; k++) { const name = bigWinnersOnly[k] || ""; html += `<div class="winner-item">${name ? '🎊 ' + name : ''}</div>`; }
         list.innerHTML = html;
     }
-
     function calcProb() {
-        const wp = parseInt(document.getElementById('set-win-p').value) || 0;
-        const sp = parseInt(document.getElementById('set-small-p').value) || 0;
-        const lp = parseInt(document.getElementById('set-lose-p').value) || 0;
-        const wl = parseInt(document.getElementById('set-win-l').value) || 0;
-        const sl = parseInt(document.getElementById('set-small-l').value) || 0;
-        
-        const total = wp + sp + lp;
-        document.getElementById('prob-total').innerText = total;
-
-        const saveBtn = document.getElementById('saveBtn');
-        let error = false;
-
-        if (total !== 100) {
-            showToast("確率設定の合計が100%になるようにしてください");
-            error = true;
-        }
-        if (wl > 10 || sl > 10 || wl < 0 || sl < 0 || wp < 0 || sp < 0 || lp < 0) {
-            showToast("本数上限(10本)または数値が不正です");
-            error = true;
-        }
-
-        saveBtn.disabled = error;
-        saveBtn.style.background = error ? "#7f8c8d" : "#27ae60";
+        const wp = parseInt(document.getElementById('set-win-p').value) || 0; const sp = parseInt(document.getElementById('set-small-p').value) || 0; const lp = parseInt(document.getElementById('set-lose-p').value) || 0;
+        const total = wp + sp + lp; document.getElementById('prob-total').innerText = total;
+        const saveBtn = document.getElementById('saveBtn'); const error = (total !== 100);
+        saveBtn.disabled = error; saveBtn.style.background = error ? "#7f8c8d" : "#27ae60";
     }
-
     function openModal() {
-        document.getElementById('set-title').value = config.title;
-        document.getElementById('set-rows').value = config.rows;
-        document.getElementById('set-cols').value = config.cols;
-        document.getElementById('set-font').value = config.fontSize;
-        document.getElementById('set-win-p').value = config.winP;
-        document.getElementById('set-win-l').value = config.winL;
-        document.getElementById('set-small-p').value = config.smallP;
-        document.getElementById('set-small-l').value = config.smallL;
-        document.getElementById('set-lose-p').value = config.loseP;
-        calcProb();
-        document.getElementById('modalOverlay').style.display = 'flex';
+        document.getElementById('set-title').value = config.title; document.getElementById('set-rows').value = config.rows; document.getElementById('set-cols').value = config.cols; document.getElementById('set-font').value = config.fontSize;
+        document.getElementById('set-win-p').value = config.winP; document.getElementById('set-small-p').value = config.smallP; document.getElementById('set-lose-p').value = config.loseP;
+        document.getElementById('set-speed').value = config.spinSpeed; calcProb(); document.getElementById('modalOverlay').style.display = 'flex';
     }
-
-    function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-    }
-
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
     async function applySettings() {
-        const wp = parseInt(document.getElementById('set-win-p').value) || 0;
-        const sp = parseInt(document.getElementById('set-small-p').value) || 0;
-        const lp = parseInt(document.getElementById('set-lose-p').value) || 0;
-        const wl = parseInt(document.getElementById('set-win-l').value) || 0;
-        const sl = parseInt(document.getElementById('set-small-l').value) || 0;
-
-        if (wp + sp + lp !== 100 || wl > 10 || sl > 10 || wl < 0 || sl < 0) {
-            return showToast("設定値を確認してください");
-        }
-
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = "保存中..."; saveBtn.disabled = true;
-        
-        config.title = document.getElementById('set-title').value || "🏆";
-        config.rows = parseInt(document.getElementById('set-rows').value);
-        config.cols = parseInt(document.getElementById('set-cols').value);
-        config.fontSize = parseInt(document.getElementById('set-font').value);
-        config.winP = wp; config.winL = wl; config.smallP = sp; config.smallL = sl; config.loseP = lp;
-
-        try {
-            await fetch(`${API_URL}?action=saveConfig&config=${encodeURIComponent(JSON.stringify(config))}`);
-            showToast("設定を保存しました");
-        } catch (e) {
-            showToast("保存に失敗しました");
-        }
-        renderWinnerBoard();
-        saveBtn.innerText = "保存して適用"; saveBtn.disabled = false;
-        closeModal();
+        const saveBtn = document.getElementById('saveBtn'); saveBtn.innerText = "保存中..."; saveBtn.disabled = true;
+        config.title = document.getElementById('set-title').value; config.rows = parseInt(document.getElementById('set-rows').value); config.cols = parseInt(document.getElementById('set-cols').value); config.fontSize = parseInt(document.getElementById('set-font').value);
+        config.winP = parseInt(document.getElementById('set-win-p').value); config.smallP = parseInt(document.getElementById('set-small-p').value); config.loseP = parseInt(document.getElementById('set-lose-p').value);
+        config.spinSpeed = parseFloat(document.getElementById('set-speed').value);
+        try { await fetch(`${API_URL}?action=saveConfig&config=${encodeURIComponent(JSON.stringify(config))}`); showToast("設定を保存しました"); } catch (e) { showToast("保存失敗"); }
+        renderWinnerBoard(); saveBtn.innerText = "保存して適用"; saveBtn.disabled = false; closeModal();
     }
-
-    function startConfetti() {
-        const canvas = document.getElementById("confetti"); const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let p = Array.from({length:80}, () => ({x:Math.random()*canvas.width, y:-20, s:Math.random()*8+4, c:`hsl(${Math.random()*360},100%,50%)`, sp:Math.random()*6+3}));
-        function drawP() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            p.forEach(i => { ctx.fillStyle=i.c; ctx.fillRect(i.x, i.y+=i.sp, i.s, i.s); if(i.y>canvas.height) i.y=-20; });
-            if(p.length>0) requestAnimationFrame(drawP);
-        }
-        drawP(); setTimeout(() => p = [], 4000);
-    }
-    
-    window.onload = async () => { 
-        renderWinnerBoard(); // 初期描画(4x2)
-        initReels(); 
-        await updateWinners();
-        setInterval(updateWinners, 5000); 
-    };
+    function startConfetti() { const canvas = document.getElementById("confetti"); const ctx = canvas.getContext("2d"); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let p = Array.from({length:80}, () => ({x:Math.random()*canvas.width, y:-20, s:Math.random()*8+4, c:`hsl(${Math.random()*360},100%,50%)`, sp:Math.random()*6+3})); drawP(); function drawP() { ctx.clearRect(0,0,canvas.width,canvas.height); p.forEach(i => { ctx.fillStyle=i.c; ctx.fillRect(i.x, i.y+=i.sp, i.s, i.s); if(i.y>canvas.height) i.y=-20; }); if(p.length>0) requestAnimationFrame(drawP); } setTimeout(() => p = [], 4000); }
+    window.onload = async () => { initReels(); await updateWinners(); setInterval(updateWinners, 5000); };
     window.onresize = initReels;
 </script>
 </body>
