@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ハピボルーレット ver.1.6.8</title>
+    <title>ハピボルーレット ver.1.6.2</title>
     
     <script>
         const imgUrls = [
@@ -11,8 +11,8 @@
             "https://i.imgur.com/rnoZlTb.jpeg", "https://i.imgur.com/WVA6hdU.jpeg", "https://i.imgur.com/qT7Cbn3.jpeg",
             "https://i.imgur.com/Pq8kdam.jpeg", "https://i.imgur.com/F84QLmL.png", "https://i.imgur.com/bSPZH8v.png",
             "https://i.imgur.com/zsVs8tV.png", "https://i.imgur.com/QoEnzAy.png", "https://i.imgur.com/wUXQD9g.png",
-            "https://i.imgur.com/sDvV2zp.png", "https://i.imgur.com/0nr5ml8.png", "https://i.imgur.com/R6OY57k.png",
-            "https://i.imgur.com/skWZ5bB.png"
+            "https://i.imgur.com/sDvV2zp.png", "https://i.imgur.com/0nr5ml8.png", "https://i.imgur.com/JmxbMui.png",
+            "https://i.imgur.com/R6OY57k.png", "https://i.imgur.com/skWZ5bB.png"
         ];
         Promise.all(imgUrls.map(url => {
             return new Promise((resolve) => {
@@ -35,12 +35,11 @@
         .version-display { position: absolute; top: 10px; right: 45px; z-index: 200; font-size: 10px; opacity: 0.5; color: var(--text-color-dark); }
         .banner-container { width: 100%; max-width: 500px; margin: 0 auto; min-height: 50px; }
         .banner-container img { width: 100%; height: auto; display: block; border: none; }
-        
-        .winner-board { background: rgba(255,255,255,0.8); margin: 10px auto; padding: 10px; border-radius: 8px; width: 94%; max-width: 480px; border: 1px solid #ccc; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .winner-board { background: rgba(255,255,255,0.8); margin: 10px auto; padding: 10px; border-radius: 8px; width: 94%; max-width: 480px; border: 1px solid #ccc; box-sizing: border-box; }
         .winner-grid { display: grid; gap: 5px; text-align: left; }
         .winner-item { border-left: 3px solid var(--accent-color); background: rgba(236,204,104,0.1); padding-left: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.5em; line-height: 1.5em; }
         
-        .slot-machine { background: var(--slot-machine-color); border: 6px solid var(--accent-color); border-radius: 15px; width: 94%; max-width: 480px; margin: 15px auto; padding: 15px 5px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; }
+        .slot-machine { background: var(--slot-machine-color); border: 6px solid var(--accent-color); border-radius: 15px; width: 94%; max-width: 480px; margin: 15px auto; padding: 15px 5px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .reels-container { display: flex; justify-content: space-around; background: #000; padding: 8px; border-radius: 10px; height: 25vw; max-height: 120px; border: 2px solid #57606f; box-sizing: border-box; }
         .reel-window { width: 30%; height: 100%; background: #fff; border-radius: 5px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .reel-strip { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-direction: column; }
@@ -57,44 +56,43 @@
         .start-btn:disabled { background: #7f8c8d; box-shadow: none; transform: translateY(4px); }
         
         canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-
-        /* エレガント演出レイヤー */
-        #result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; flex-direction: column; justify-content: flex-start; align-items: center; z-index: 1500; padding: 20px 20px; }
-        
-        /* エレガントな黄金の揺らぎ（オーラ） */
-        @keyframes elegant-aura { 
-            0%, 100% { background: radial-gradient(circle at center, rgba(184,134,11,0.2) 0%, rgba(0,0,0,0.95) 70%); } 
-            50% { background: radial-gradient(circle at center, rgba(236,204,104,0.35) 0%, rgba(0,0,0,0.92) 80%); } 
-        }
-        .flash-active { animation: elegant-aura 3s ease-in-out infinite; }
-        
-        .res-char-top { width: 60%; max-width: 200px; transform: translateY(20px); opacity: 0; transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1); margin-top: 10px; }
-        
-        /* 高級感UP: 文字の洗練された影 */
-        .res-msg { 
-            font-size: 1.8rem; font-weight: bold; color: #fff; 
-            text-shadow: 0 2px 10px rgba(236,204,104,0.6); 
-            margin: 10px 0 35vh 0; z-index: 1600; text-align: center;
-        }
-        
-        .res-ok-btn { background: linear-gradient(to bottom, #f1c40f, #d4af37); color: #333; border: none; padding: 15px 50px; border-radius: 50px; font-size: 1.4rem; font-weight: bold; box-shadow: 0 4px 0 #927a23; cursor: pointer; margin-top: auto; margin-bottom: 30px; z-index: 1600; }
-        .show-res .res-char-top { transform: translateY(0); opacity: 1; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; color: #333; text-align: left; position: relative; max-height: 90vh; overflow-y: auto; }
         .modal-close { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; padding: 5px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 20px; z-index: 2000; display: none; font-size: 14px; white-space: nowrap; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* リザルト演出用CSS */
+        .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; pointer-events: auto; }
+        .result-content { width: 90%; max-width: 400px; padding: 30px 10px; border-radius: 20px; text-align: center; animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; margin-top: -100px; }
+        @keyframes modalPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .result-title { font-weight: bold; white-space: nowrap; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .result-images { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .result-images img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); background: #fff; }
+        .close-result-btn { background: #333; color: #fff; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #000; }
+        
+        /* 結果別デザイン */
+        .res-bigwin { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border: 4px solid #fff; box-shadow: 0 0 30px #f6d365; }
+        .res-smallwin { background: linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%); border: 4px solid #fff; box-shadow: 0 0 20px #fff; }
+        .res-lose { background: #fff; border: 4px solid #ccc; }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <div class="version-display">ver.1.6.8</div>
+    <div class="version-display">ver.1.6.2</div>
     <div class="settings-trigger" onclick="openModal()">⚙️</div>
-
-    <div id="result-overlay">
-        <img id="res-logo" src="https://i.imgur.com/skWZ5bB.png" class="res-char-top">
-        <div id="res-msg" class="res-msg"></div>
-        <button class="res-ok-btn" onclick="closeResultModal()">OK</button>
+    
+    <div id="resultOverlay" class="result-overlay">
+        <div id="resultContent" class="result-content">
+            <div id="resultText" class="result-title"></div>
+            <div id="resultImages" class="result-images"></div>
+            <button class="close-result-btn" onclick="closeResultModal()">閉じる</button>
+        </div>
     </div>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -126,6 +124,11 @@
                     <input type="number" id="set-lose-p" oninput="calcProb()" style="width:50px;" inputmode="numeric">％
                     上限<input type="text" value="なし" disabled style="width:40px; background:#eee; text-align:center;">本
                 </div>
+            </div>
+
+            <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight:bold;">パスワード設定</span>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
             </div>
 
             <button id="saveBtn" onclick="applySettings()" style="width:100%; padding:12px; background:#27ae60; color:#fff; border:none; border-radius:8px; font-weight:bold;">保存して適用</button>
@@ -170,12 +173,15 @@
         "白": "https://i.imgur.com/zsVs8tV.png", "紫": "https://i.imgur.com/QoEnzAy.png", "ピンク": "https://i.imgur.com/wUXQD9g.png",
         "青": "https://i.imgur.com/sDvV2zp.png", "黄": "https://i.imgur.com/0nr5ml8.png", "オレンジ": "https://i.imgur.com/R6OY57k.png"
     };
-    const girls = ["緑", "赤", "白", "紫", "ピンク", "青", "黄", "オレンジ"];
+    const girlColors = ["緑", "赤", "白", "紫", "ピンク", "青", "黄", "オレンジ"];
     const dummyKeys = Object.keys(imgs);
     const dummyImgs = Object.values(imgs);
 
     let resultData = null; let stoppedCount = 0; let isProcessing = false;
-    let config = { title: "🏆", rows: 4, cols: 2, fontSize: 13, winP: 10, winL: 7, smallP: 10, smallL: 7, loseP: 80 };
+    let config = { 
+        title: "🏆", rows: 3, cols: 1, fontSize: 13,
+        winP: 10, winL: 7, smallP: 10, smallL: 7, loseP: 80
+    };
     let currentWinners = [];
     let sessionStopChars = ["", "", ""];
 
@@ -200,33 +206,53 @@
 
     async function startSlot() {
         if (isProcessing) return;
-        const name = document.getElementById('nameInput').value.trim().replace(/<[^>]*>?/gm, '');
+        const rawName = document.getElementById('nameInput').value.trim();
+        const name = rawName.replace(/<[^>]*>?/gm, '');
         if (!name) return alert("名前を入れてね！");
+        
         isProcessing = true;
         const drawBtn = document.getElementById('drawBtn');
-        drawBtn.innerText = "通信中..."; drawBtn.disabled = true;
+        drawBtn.innerText = "通信中...";
+        drawBtn.disabled = true;
+
         try {
             const res = await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=check`);
             resultData = await res.json();
-            if (resultData && resultData.result === "当たり") { await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm`); }
-            drawBtn.innerText = "スタート"; stoppedCount = 0;
-            for(let i=1; i<=3; i++) document.getElementById('strip'+i).classList.add('spinning');
             
+            // サーバー判定が当たりの場合は大当たり確定。ハズレの場合はフロント予備抽選。
             const isBigWin = (resultData.result === "当たり");
-            const isSmallWin = (!isBigWin && Math.random() < 0.15);
+            const isSmallWin = (!isBigWin && Math.random() < 0.15); // 暫定15%
+
             if (isBigWin) {
                 sessionStopChars = ["ハ", "ピ", "ボ"];
+                await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm`);
             } else if (isSmallWin) {
-                const luckyGirl = girls[Math.floor(Math.random() * girls.length)];
-                sessionStopChars = [luckyGirl, luckyGirl, luckyGirl];
+                const color = girlColors[Math.floor(Math.random() * girlColors.length)];
+                sessionStopChars = [color, color, color];
+                await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm`);
             } else {
                 do {
-                    sessionStopChars = [dummyKeys[Math.floor(Math.random() * dummyKeys.length)], dummyKeys[Math.floor(Math.random() * dummyKeys.length)], dummyKeys[Math.floor(Math.random() * dummyKeys.length)]];
-                } while ((sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2]) || (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ"));
+                    sessionStopChars = [
+                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)],
+                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)],
+                        dummyKeys[Math.floor(Math.random() * dummyKeys.length)]
+                    ];
+                } while (
+                    (sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2]) ||
+                    (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ")
+                );
             }
+
+            drawBtn.innerText = "スタート";
+            stoppedCount = 0;
+            for(let i=0; i<3; i++) document.getElementById('strip'+(i+1)).classList.add('spinning');
             for(let i=1; i<=3; i++) document.getElementById('stop'+i).disabled = false;
+
         } catch (e) {
-            alert("通信エラー"); isProcessing = false; drawBtn.disabled = false; drawBtn.innerText = "スタート";
+            alert("通信エラーにより当選が確定できませんでした。運営に問い合わせてください。");
+            isProcessing = false;
+            drawBtn.disabled = false;
+            drawBtn.innerText = "スタート";
         }
     }
 
@@ -234,41 +260,50 @@
         const strip = document.getElementById('strip' + (index + 1));
         const btn = document.getElementById('stop' + (index + 1));
         const reelHeight = document.querySelector('.reel-window').offsetHeight;
-        btn.disabled = true; strip.classList.remove('spinning');
-        strip.innerHTML = `<div class="symbol" style="height:${reelHeight}px;"><img src="${imgs[sessionStopChars[index]]}"></div>`;
+        btn.disabled = true;
+        strip.classList.remove('spinning');
+        const finalChar = sessionStopChars[index];
+        strip.innerHTML = `<div class="symbol" style="height:${reelHeight}px;"><img src="${imgs[finalChar]}"></div>`;
         stoppedCount++; if (stoppedCount === 3) setTimeout(finish, 500);
     }
 
-    async function finish() {
-        const isBigWin = (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ");
-        const isSmallWin = (!isBigWin && sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2]);
-        const overlay = document.getElementById('result-overlay');
-        const msg = document.getElementById('res-msg');
-        const logo = document.getElementById('res-logo');
-        logo.src = "https://i.imgur.com/skWZ5bB.png";
+    function finish() {
+        const isBig = (sessionStopChars[0] === "ハ" && sessionStopChars[1] === "ピ" && sessionStopChars[2] === "ボ");
+        const isSmall = (!isBig && sessionStopChars[0] === sessionStopChars[1] && sessionStopChars[1] === sessionStopChars[2] && girlColors.includes(sessionStopChars[0]));
+
+        const overlay = document.getElementById('resultOverlay');
+        const content = document.getElementById('resultContent');
+        const text = document.getElementById('resultText');
+        const imgDiv = document.getElementById('resultImages');
+
+        content.className = 'result-content';
+        imgDiv.innerHTML = sessionStopChars.map(c => `<img src="${imgs[c]}">`).join('');
         
-        if (isBigWin) {
-            msg.innerText = "🎉大当たり!! おめでとう！🎊";
-            overlay.classList.add('flash-active');
-            startConfetti(true);
-        } else if (isSmallWin) {
-            msg.innerText = "🎊当たり！おめでとう！🎊";
-            overlay.classList.add('flash-active');
-            startConfetti(false);
+        // フォントサイズを画面幅に合わせて調整（折り返し防止）
+        const vw = window.innerWidth / 100;
+        text.style.fontSize = (vw * 8) + "px";
+
+        if (isBig) {
+            content.classList.add('res-bigwin');
+            text.innerText = "大当たり！おめでとう！";
+            startConfetti();
+        } else if (isSmall) {
+            content.classList.add('res-smallwin');
+            text.innerText = "当たり！おめでとう！";
+            startConfetti();
         } else {
-            msg.innerText = "残念！はずれです。";
-            overlay.classList.remove('flash-active');
+            content.classList.add('res-lose');
+            text.innerText = "ハズレ…残念";
+            text.style.color = "#666";
         }
-        
+
         overlay.style.display = 'flex';
-        requestAnimationFrame(() => { requestAnimationFrame(() => { overlay.classList.add('show-res'); }); });
+        updateWinners();
     }
 
     function closeResultModal() {
-        const overlay = document.getElementById('result-overlay');
-        overlay.classList.remove('show-res', 'flash-active');
-        overlay.style.display = 'none';
-        resetMachine(); updateWinners();
+        document.getElementById('resultOverlay').style.display = 'none';
+        resetMachine();
     }
 
     function resetMachine() {
@@ -284,7 +319,9 @@
             const res = await fetch(`${API_URL}?action=getBoard`);
             const data = await res.json();
             currentWinners = data.winners || [];
-            if (data.config) { Object.assign(config, data.config); }
+            if (data.config) {
+                Object.assign(config, data.config);
+            }
             renderWinnerBoard();
         } catch (e) {}
     }
@@ -296,10 +333,12 @@
         list.style.fontSize = `${config.fontSize}px`;
         document.getElementById('wb-title').innerText = config.title;
         let html = '';
-        const rowsCount = parseInt(config.rows) || 4;
-        const colsCount = parseInt(config.cols) || 2;
+        const rowsCount = parseInt(config.rows) || 1;
+        const colsCount = parseInt(config.cols) || 1;
         const totalSlots = rowsCount * colsCount;
-        for (let k = 0; k < totalSlots; k++) { html += `<div class="winner-item">${currentWinners[k] ? '🎊 ' + currentWinners[k] : ''}</div>`; }
+        for (let k = 0; k < totalSlots; k++) {
+            html += `<div class="winner-item">${currentWinners[k] ? '🎊 ' + currentWinners[k] : ''}</div>`;
+        }
         list.innerHTML = html;
     }
 
@@ -307,11 +346,26 @@
         const wp = parseInt(document.getElementById('set-win-p').value) || 0;
         const sp = parseInt(document.getElementById('set-small-p').value) || 0;
         const lp = parseInt(document.getElementById('set-lose-p').value) || 0;
+        const wl = parseInt(document.getElementById('set-win-l').value) || 0;
+        const sl = parseInt(document.getElementById('set-small-l').value) || 0;
+        
         const total = wp + sp + lp;
         document.getElementById('prob-total').innerText = total;
+
         const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = (total !== 100);
-        saveBtn.style.background = (total !== 100) ? "#7f8c8d" : "#27ae60";
+        let error = false;
+
+        if (total !== 100) {
+            showToast("確率設定の合計が100%になるようにしてください");
+            error = true;
+        }
+        if (wl > 10 || sl > 10 || wl < 0 || sl < 0 || wp < 0 || sp < 0 || lp < 0) {
+            showToast("本数上限(10本)または数値が不正です");
+            error = true;
+        }
+
+        saveBtn.disabled = error;
+        saveBtn.style.background = error ? "#7f8c8d" : "#27ae60";
     }
 
     function openModal() {
@@ -328,47 +382,58 @@
         document.getElementById('modalOverlay').style.display = 'flex';
     }
 
-    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
 
     async function applySettings() {
+        const wp = parseInt(document.getElementById('set-win-p').value) || 0;
+        const sp = parseInt(document.getElementById('set-small-p').value) || 0;
+        const lp = parseInt(document.getElementById('set-lose-p').value) || 0;
+        const wl = parseInt(document.getElementById('set-win-l').value) || 0;
+        const sl = parseInt(document.getElementById('set-small-l').value) || 0;
+
+        if (wp + sp + lp !== 100 || wl > 10 || sl > 10 || wl < 0 || sl < 0) {
+            return showToast("設定値を確認してください");
+        }
+
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = "保存中..."; saveBtn.disabled = true;
+        
         config.title = document.getElementById('set-title').value || "🏆";
         config.rows = parseInt(document.getElementById('set-rows').value);
         config.cols = parseInt(document.getElementById('set-cols').value);
         config.fontSize = parseInt(document.getElementById('set-font').value);
-        config.winP = parseInt(document.getElementById('set-win-p').value);
-        config.winL = parseInt(document.getElementById('set-win-l').value);
-        config.smallP = parseInt(document.getElementById('set-small-p').value);
-        config.smallL = parseInt(document.getElementById('set-small-l').value);
-        config.loseP = parseInt(document.getElementById('set-lose-p').value);
+        config.winP = wp; config.winL = wl; config.smallP = sp; config.smallL = sl; config.loseP = lp;
+
         try {
             await fetch(`${API_URL}?action=saveConfig&config=${encodeURIComponent(JSON.stringify(config))}`);
             showToast("設定を保存しました");
-        } catch (e) { showToast("保存失敗"); }
+        } catch (e) {
+            showToast("保存に失敗しました");
+        }
         renderWinnerBoard();
-        saveBtn.innerText = "保存して適用"; saveBtn.disabled = false; closeModal();
+        saveBtn.innerText = "保存して適用"; saveBtn.disabled = false;
+        closeModal();
     }
 
-    function startConfetti(isRich) {
+    function startConfetti() {
         const canvas = document.getElementById("confetti"); const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const count = isRich ? 150 : 60;
-        let p = Array.from({length:count}, () => ({
-            x:Math.random()*canvas.width, y:-20, 
-            s:Math.random()*6+4, 
-            c:`hsl(${Math.random()*360},100%,${isRich?65:50}%)`, 
-            sp:Math.random()*4+1
-        }));
+        let p = Array.from({length:80}, () => ({x:Math.random()*canvas.width, y:-20, s:Math.random()*8+4, c:`hsl(${Math.random()*360},100%,50%)`, sp:Math.random()*6+3}));
         function drawP() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             p.forEach(i => { ctx.fillStyle=i.c; ctx.fillRect(i.x, i.y+=i.sp, i.s, i.s); if(i.y>canvas.height) i.y=-20; });
             if(p.length>0) requestAnimationFrame(drawP);
         }
-        drawP(); setTimeout(() => p = [], 4500);
+        drawP(); setTimeout(() => p = [], 4000);
     }
     
-    window.onload = async () => { initReels(); await updateWinners(); setInterval(updateWinners, 5000); };
+    window.onload = async () => { 
+        initReels(); 
+        await updateWinners();
+        setInterval(updateWinners, 5000); 
+    };
     window.onresize = initReels;
 </script>
 </body>
