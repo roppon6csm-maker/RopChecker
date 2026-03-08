@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ハピボルーレット ver.1.6.0</title>
+    <title>ハピボルーレット ver.1.6.1</title>
     
     <script>
         const imgUrls = [
@@ -26,38 +26,40 @@
 
     <style>
         /* ############################################################
-           ⚠️ [STRICT BLOCK: UI_DESIGN_SYSTEM] ⚠️ 一切の変更を禁ずる。
+           ⚠️ [STRICT BLOCK: UI_DESIGN_SYSTEM] ⚠️ 改変・削除を厳禁。
            ############################################################ */
         :root { --bg-color: #f1f1f1; --slot-machine-color: #341f97; --accent-color: #eccc68; --text-color-dark: #333; }
+        * { box-sizing: border-box; }
         body { background-color: var(--bg-color); color: var(--text-color-dark); font-family: sans-serif; text-align: center; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         .settings-trigger { position: absolute; top: 10px; right: 10px; z-index: 200; font-size: 24px; cursor: pointer; opacity: 0.4; }
         .version-display { position: absolute; top: 10px; right: 45px; z-index: 200; font-size: 10px; opacity: 0.5; color: var(--text-color-dark); }
-        .banner-container { width: 100%; max-width: 500px; margin: 0 auto; min-height: 100px; }
+        .banner-container { width: 100%; max-width: 500px; margin: 0 auto; min-height: 50px; }
         .banner-container img { width: 100%; height: auto; display: block; border: none; }
-        .winner-board { background: rgba(255,255,255,0.8); margin: 10px auto; padding: 10px; border-radius: 8px; width: 90%; max-width: 360px; border: 1px solid #ccc; box-sizing: border-box; }
+        .winner-board { background: rgba(255,255,255,0.8); margin: 10px auto; padding: 10px; border-radius: 8px; width: 94%; max-width: 480px; border: 1px solid #ccc; box-sizing: border-box; }
         .winner-grid { display: grid; gap: 5px; text-align: left; }
         .winner-item { border-left: 3px solid var(--accent-color); background: rgba(236,204,104,0.1); padding-left: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.5em; line-height: 1.5em; }
-        .slot-machine { background: var(--slot-machine-color); border: 6px solid var(--accent-color); border-radius: 15px; width: 92%; max-width: 340px; margin: 15px auto; padding: 15px 5px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .reels-container { display: flex; justify-content: space-around; background: #000; padding: 8px; border-radius: 10px; height: 100px; border: 2px solid #57606f; box-sizing: border-box; }
-        .reel-window { width: 30%; height: 80px; background: #fff; border-radius: 5px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        
+        .slot-machine { background: var(--slot-machine-color); border: 6px solid var(--accent-color); border-radius: 15px; width: 94%; max-width: 480px; margin: 15px auto; padding: 15px 5px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .reels-container { display: flex; justify-content: space-around; background: #000; padding: 8px; border-radius: 10px; height: 25vw; max-height: 120px; border: 2px solid #57606f; box-sizing: border-box; }
+        .reel-window { width: 30%; height: 100%; background: #fff; border-radius: 5px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .reel-strip { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-direction: column; }
-        .symbol { height: 80px; width: 100%; display: flex; align-items: center; justify-content: center; }
-        .symbol img { max-height: 70px; max-width: 90%; object-fit: contain; }
-        @keyframes spin { from { transform: translateY(0); } to { transform: translateY(-800px); } }
+        .symbol { height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .symbol img { max-height: 90%; max-width: 90%; object-fit: contain; }
+        
+        @keyframes spin { from { transform: translateY(0); } to { transform: translateY(-300%); } }
         .spinning { animation: spin 0.3s linear infinite; }
+        
         .stop-buttons { display: flex; justify-content: space-around; margin-top: 15px; }
-        .stop-btn { width: 28%; padding: 12px 0; background: #ecf0f1; border: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px #bdc3c7; color: #333; cursor: pointer; }
+        .stop-btn { width: 28%; padding: 12px 0; background: #ecf0f1; border: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px #bdc3c7; color: #333; cursor: pointer; font-size: 16px; }
         .stop-btn:disabled { background: #7f8c8d; color: #95a5a6; box-shadow: none; transform: translateY(2px); }
-        .start-btn { background: #ff4757; color: #fff; border: none; padding: 15px 0; width: 85%; max-width: 280px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 5px 0 #b33939; cursor: pointer; margin-top: 10px; }
+        .start-btn { background: #ff4757; color: #fff; border: none; padding: 15px 0; width: 90%; max-width: 320px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 5px 0 #b33939; cursor: pointer; margin-top: 10px; }
         .start-btn:disabled { background: #7f8c8d; box-shadow: none; transform: translateY(4px); }
+        
         canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 85%; max-width: 340px; color: #333; text-align: left; position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; color: #333; text-align: left; position: relative; max-height: 90vh; overflow-y: auto; }
         .modal-close { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; padding: 5px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
-        
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 20px; z-index: 2000; display: none; font-size: 14px; white-space: nowrap; }
-
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
@@ -68,7 +70,7 @@
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <div class="version-display">ver.1.6.0</div>
+    <div class="version-display">ver.1.6.1</div>
     <div class="settings-trigger" onclick="openModal()">⚙️</div>
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
@@ -130,7 +132,7 @@
             <button class="stop-btn" id="stop3" onclick="handleStop(2)" disabled>STOP</button>
         </div>
         <div style="margin-top:15px;">
-            <input type="text" id="nameInput" placeholder="ニックネームを入力" maxlength="10" style="padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; width: 85%; box-sizing: border-box;">
+            <input type="text" id="nameInput" placeholder="ニックネームを入力" maxlength="10" style="padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; width: 90%; box-sizing: border-box;">
             <button id="drawBtn" class="start-btn" onclick="startSlot()">スタート</button>
         </div>
     </div>
@@ -166,12 +168,13 @@
     }
 
     function initReels() {
+        const reelHeight = document.querySelector('.reel-window').offsetHeight;
         for(let i=1; i<=3; i++) {
             const strip = document.getElementById('strip'+i);
             let html = '';
             for(let j=0; j<10; j++) {
                 const src = dummyImgs[Math.floor(Math.random() * dummyImgs.length)];
-                html += `<div class="symbol"><img src="${src}"></div>`;
+                html += `<div class="symbol" style="height:${reelHeight}px;"><img src="${src}"></div>`;
             }
             strip.innerHTML = html;
         }
@@ -180,7 +183,7 @@
     async function startSlot() {
         if (isProcessing) return;
         const rawName = document.getElementById('nameInput').value.trim();
-        const name = rawName.replace(/<[^>]*>?/gm, ''); // XSSサニタイズ
+        const name = rawName.replace(/<[^>]*>?/gm, '');
         if (!name) return alert("名前を入れてね！");
         
         isProcessing = true;
@@ -189,16 +192,13 @@
         drawBtn.disabled = true;
 
         try {
-            // 演出の前に通信（check & confirmを同時に行う想定のシーケンス）
             const res = await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=check`);
             resultData = await res.json();
             
-            // サーバー側で受理された後の確定処理（confirm）
             if (resultData && resultData.result === "当たり") {
                 await fetch(`${API_URL}?name=${encodeURIComponent(name)}&action=confirm`);
             }
 
-            // 通信成功後に演出開始
             drawBtn.innerText = "スタート";
             stoppedCount = 0;
             for(let i=0; i<3; i++) document.getElementById('strip'+(i+1)).classList.add('spinning');
@@ -236,10 +236,11 @@
     function handleStop(index) {
         const strip = document.getElementById('strip' + (index + 1));
         const btn = document.getElementById('stop' + (index + 1));
+        const reelHeight = document.querySelector('.reel-window').offsetHeight;
         btn.disabled = true;
         strip.classList.remove('spinning');
         const finalChar = sessionStopChars[index];
-        strip.innerHTML = `<div class="symbol"><img src="${imgs[finalChar]}"></div>`;
+        strip.innerHTML = `<div class="symbol" style="height:${reelHeight}px;"><img src="${imgs[finalChar]}"></div>`;
         stoppedCount++; if (stoppedCount === 3) setTimeout(finish, 500);
     }
 
@@ -382,11 +383,13 @@
         }
         drawP(); setTimeout(() => p = [], 4000);
     }
+    
     window.onload = async () => { 
         initReels(); 
-        await updateWinners(); // 起動時にサーバーから最新設定を取得
+        await updateWinners();
         setInterval(updateWinners, 5000); 
     };
+    window.onresize = initReels;
 </script>
 </body>
 </html>
